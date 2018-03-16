@@ -11,34 +11,41 @@ ChannelId = -1001392228565
 BoldPrefix = '<b>'
 BoldPostfix = '</b>'
 
+ChampionatMainUrl = "https://www.championat.com/football/_worldcup.html"
+TestUrl = "https://www.championat.com/football/article-3375221-chm-2018-kakie-anglijskie-futbolnye-terminy-nado-znat-bolelschiku.html"#'https://www.championat.com/football/article-3374095-denis-cheryshev-vpervye-vyzvan-stanislavom-cherchesovym-v-sbornuju-rossii.html'
+
 bot = telegram.Bot(token=TOKEN)
+logging.basicConfig(level=logging.INFO)
 
 def post_text(post):
 
+    if not isinstance(post, Post):
+        logging.WARNING("pos_text: post is None")
+        return False
     message = BoldPrefix
     message += post.header
     message += BoldPostfix + '\n\n'
-    message += post.body
+    message += post.text
 
     try:
         bot.send_message(ChannelId, text=message, parse_mode='HTML')
     except Exception as ex:
-        print('post_text: exception: ' + str(ex))
+        logging.warning('post_text: exception: ' + str(ex))
 
 
 def post_picture(picture_file, caption=''):
     try:
         bot.sendPhoto(ChannelId, photo=open(picture_file, 'rb'), caption=caption)
     except Exception as ex:
-        print('post_picture: failed to send photo: ' + str(ex))
+        logging.warning('post_picture: failed to send photo: ' + str(ex))
 
 
-def get_new_text():
+def get_new_post():
     return ''
 
 
 def main():
-    post_text(Post("Header", "Text"))
+    post_text(Post.from_url(TestUrl))
     # while True:
     #     try:
     #         text = get_new_text()
