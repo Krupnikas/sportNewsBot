@@ -12,7 +12,7 @@ BoldPrefix = '<b>'
 BoldPostfix = '</b>'
 
 ChampionatMainUrl = "https://www.championat.com/football/_worldcup.html"
-TestUrl = "https://www.championat.com/football/article-3375221-chm-2018-kakie-anglijskie-futbolnye-terminy-nado-znat-bolelschiku.html"#'https://www.championat.com/football/article-3374095-denis-cheryshev-vpervye-vyzvan-stanislavom-cherchesovym-v-sbornuju-rossii.html'
+TestUrl = "https://www.championat.com/football/article-3374347-fifa-prodaet-bilety-na-chempionat-mira-po-futbolu-v-rossii-v-2018-godu.html"#"https://www.championat.com/football/article-3375221-chm-2018-kakie-anglijskie-futbolnye-terminy-nado-znat-bolelschiku.html"#'https://www.championat.com/football/article-3374095-denis-cheryshev-vpervye-vyzvan-stanislavom-cherchesovym-v-sbornuju-rossii.html'
 
 bot = telegram.Bot(token=TOKEN)
 logging.basicConfig(level=logging.INFO)
@@ -44,8 +44,36 @@ def get_new_post():
     return ''
 
 
+def get_list_of_championat_urls():
+    try:
+        response = requests.get(url=ChampionatMainUrl)
+    except Exception as ex:
+        logging.warning("get_list_of_championat_urls: exception: " + str(ex))
+        return None
+
+    if response.status_code != 200:
+        logging.warning("get_list_of_championat_urls: wrong responce code: " + str(response.status_code))
+        return None
+
+    root = html.fromstring(response.content)
+    tree = etree.ElementTree(root)
+
+    # print(response.text)
+
+    for element in root.iter():
+        try:
+            if 'article' in element.text:
+                print(tree.getpath(element))
+                print(element.text)
+        except Exception as ex:
+            logging.debug("get_list_of_championat_urls: exception: " + str(ex))
+
+
+    return [TestUrl]
+
+
 def main():
-    post_text(Post.from_url(TestUrl))
+    post_text(Post.from_url(get_list_of_championat_urls()[0]))
     # while True:
     #     try:
     #         text = get_new_text()

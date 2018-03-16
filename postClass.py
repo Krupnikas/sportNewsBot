@@ -26,38 +26,46 @@ class Post:
     def from_championat_url(cls, url):
 
         try:
-            responce = requests.get(url=url)
+            response = requests.get(url=url)
         except Exception as ex:
             logging.warning("Post: from_url: exception: " + str(ex))
             return None
 
-        if responce.status_code != 200:
-            logging.warning("Post: from_url: wrong responce code: " + str(responce.status_code))
+        if response.status_code != 200:
+            logging.warning("Post: from_url: wrong responce code: " + str(response.status_code))
             return None
 
-        root = html.fromstring(responce.content)
+        root = html.fromstring(response.content)
         tree = etree.ElementTree(root)
+        title = tree.xpath(ChampionatTitlePath)[0].text
+        text = ""
+        # for element in root.iter():
+        #     try:
+        #         if 'На курс нужно регистрироваться?' in element.text:
+        #             print(element.text)
+        #             print(tree.getpath(element))
+        #     except Exception as ex:
+        #         logging.debug("Post: from_url: exception: " + str(ex))
 
         for element in root.iter():
             try:
-                if 'Черчесов вспомнил ' in element.text:
-                    print(element.text)
-                    print(tree.getpath(element))
+                if '/html/body/div[5]/div[5]/div[1]/article/div/' in tree.getpath(element) and element.text is not None:
+                    # print(element.text)
+                    if len(text) == 0:
+                        text = element.text
+                    else:
+                        text = text + "\n\n" + element.text
+                    # print(tree.getpath(element))
             except Exception as ex:
                 logging.debug("Post: from_url: exception: " + str(ex))
 
-        print(tree.xpath("/html/body/div[5]/div[5]/div[1]/article/header/h1")[0].text)
-        print(type(tree.xpath("/html/body/div[5]/div[5]/div[1]/article/header/h1")[0]))
-
+        # print(tree.xpath("/html/body/div[5]/div[5]/div[1]/article/header/h1")[0].text)
+        # print(type(tree.xpath("/html/body/div[5]/div[5]/div[1]/article/header/h1")[0]))
+        #
         # print(responce.text)
 
         # list = [tree.iter()]
         # print(list)
 
-        # for element in tree.xpath('//text()'):
-        #     if 'Черчесов вспомнил ' in element:
-        #         print(element)
-        #         print(element.getroottree().getpath(element))
-
-        exit(0)
-        return Post("ChampHeader", "ChampText :balloon:, Hello!")
+        # exit(0)
+        return Post(title, text)
