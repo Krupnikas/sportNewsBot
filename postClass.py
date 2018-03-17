@@ -7,6 +7,7 @@ import logging
 ChampionatUrlIdentifier = 'championat.com'
 ChampionatTitlePath = "/html/body/div[5]/div[5]/div[1]/article/header/h1"
 
+
 class Post:
     def __init__(self, header, text, picture_file=''):
         self.header = emojize(header, use_aliases=True)

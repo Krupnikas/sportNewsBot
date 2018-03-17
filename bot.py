@@ -6,6 +6,9 @@ from postClass import *
 # from tendo import singleton
 # me = singleton.SingleInstance()
 
+PostOnStartUp = False
+NewsCheckPeriod = 60    # seconds
+
 TOKEN = '582293326:AAG-1JSt4WHDXE9kMu4KFs7pghcIWKFdFE0'
 ChannelId = -1001392228565
 BoldPrefix = '<b>'
@@ -72,15 +75,21 @@ def get_list_of_championat_urls():
 
 
 def main():
-    post_text(Post.from_url(get_list_of_championat_urls()[0]))
-    # while True:
-    #     try:
-    #         text = get_new_text()
-    #         if text != '':
-    #             post_text(text)
-    #     except Exception as ex:
-    #         print('main: exception: ' + str(ex))
-    #     sleep(10)
+
+    if PostOnStartUp:
+        latest_post_article = ""
+    else:
+        latest_post_article = get_list_of_championat_urls()[0]
+
+    while True:
+        try:
+            latest_championat_article_url = get_list_of_championat_urls()[0]
+            if latest_championat_article_url != latest_post_article:
+                latest_post_article = latest_championat_article_url
+                post_text(Post.from_url(latest_post_article))
+        except Exception as ex:
+            print('main: exception: ' + str(ex))
+        sleep(NewsCheckPeriod)
 
 
 if __name__ == '__main__':
