@@ -56,20 +56,19 @@ def get_list_of_championat_urls():
         return None
 
     root = html.fromstring(response.content)
-    tree = etree.ElementTree(root)
+    links = root.cssselect('a')
 
-    # print(response.text)
+    articles = []
 
-    for element in root.iter():
-        try:
-            if 'article' in element.text:
-                print(tree.getpath(element))
-                print(element.text)
-        except Exception as ex:
-            logging.debug("get_list_of_championat_urls: exception: " + str(ex))
+    for link in links:
+        str_link = str(link.get('href'))
+        if 'article-' in str_link and str_link not in articles:
+            articles.append(str_link)
 
+    logging.debug("Articles:")
+    logging.debug("\n".join(articles))
 
-    return [TestUrl]
+    return articles
 
 
 def main():
