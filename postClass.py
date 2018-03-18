@@ -6,7 +6,8 @@ import logging
 
 ChampionatUrlIdentifier = 'championat.com'
 ChampionatTitlePath = "/html/body/div[5]/div[5]/div[1]/article/header/h1"
-
+ChampionatSubtitlePath = "/html/body/div[5]/div[5]/div[1]/article/header/div[3]"
+ChampionatArticlePath = "/html/body/div[5]/div[5]/div[1]/article/div"
 
 class Post:
     def __init__(self, header, text, picture_file=''):
@@ -39,7 +40,17 @@ class Post:
         root = html.fromstring(response.content)
         tree = etree.ElementTree(root)
         title = tree.xpath(ChampionatTitlePath)[0].text
-        text = ""
+        subtitle = tree.xpath(ChampionatSubtitlePath)[0].text
+        text = ("".join(tree.xpath(ChampionatArticlePath)[0].itertext()))
+
+        import re
+        text = re.sub(' +', ' ', text)
+        text = re.sub('\t+', '', text)
+        text = re.sub('\n ', '\n', text)
+        text = re.sub('\n+', '\n    ', text)
+        # text = "   " + re.sub('\n \n +', '\n ', text)
+        # text = re.sub('\n +', '\n    ', text)
+
         # for element in root.iter():
         #     try:
         #         if 'На курс нужно регистрироваться?' in element.text:
@@ -47,18 +58,19 @@ class Post:
         #             print(tree.getpath(element))
         #     except Exception as ex:
         #         logging.debug("Post: from_url: exception: " + str(ex))
-
-        for element in root.iter():
-            try:
-                if '/html/body/div[5]/div[5]/div[1]/article/div/' in tree.getpath(element) and element.text is not None:
-                    # print(element.text)
-                    if len(text) == 0:
-                        text = element.text
-                    else:
-                        text = text + "\n\n" + element.text
-                    # print(tree.getpath(element))
-            except Exception as ex:
-                logging.debug("Post: from_url: exception: " + str(ex))
+        #
+        # for element in root.iter():
+        #     try:
+        #         if '/html/body/div[5]/div[5]/div[1]/article/' in tree.getpath(element):
+        #             print("Text: " + " ".join(element.itertext()))
+        #             print("Path: " + tree.getpath(element) + "\n\n")
+        #             if len(text) == 0:
+        #                 text = " ".join(element.itertext())
+        #             elif not " ".join(element.itertext()).isspace():
+        #                 text = text + "\n\n" + " ".join(element.itertext()).strip()
+        #             # print(tree.getpath(element))
+        #     except Exception as ex:
+        #         logging.warning("Post: from_url: exception: " + str(ex))
 
         # print(tree.xpath("/html/body/div[5]/div[5]/div[1]/article/header/h1")[0].text)
         # print(type(tree.xpath("/html/body/div[5]/div[5]/div[1]/article/header/h1")[0]))
@@ -66,7 +78,8 @@ class Post:
         # print(responce.text)
 
         # list = [tree.iter()]
-        # print(list)
+        print("Titile: " + title)
+        print("Subtitle: " + subtitle)
+        print("Text: " + text)
 
-        # exit(0)
         return Post(title, text)
