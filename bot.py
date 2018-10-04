@@ -10,7 +10,11 @@ PostOnStartUp = True
 NewsCheckPeriod = 60    # seconds
 
 TOKEN = '582293326:AAG-1JSt4WHDXE9kMu4KFs7pghcIWKFdFE0'
-ChannelId = -1001392228565
+
+FootballChannelId = -1001392228565
+GifChannelId = -1001327157181
+ChannelId = GifChannelId
+
 BoldPrefix = '<b>'
 BoldPostfix = '</b>'
 
@@ -26,7 +30,7 @@ def post_text(post):
         logging.WARNING("pos_text: post is None")
         return False
     message = BoldPrefix
-    message += post.header
+    message += post.title
     message += BoldPostfix + '\n\n'
     message += post.text
 
@@ -41,6 +45,15 @@ def post_picture(picture_file, caption=''):
         bot.sendPhoto(ChannelId, photo=open(picture_file, 'rb'), caption=caption)
     except Exception as ex:
         logging.warning('post_picture: failed to send photo: ' + str(ex))
+
+def post_gif(post):
+    try:
+        logging.info("Started gif upload for post " + post.title + "...")
+        bot.send_video(ChannelId, video=open(post.gifFile, 'rb'), caption=post.title, timeout=60)
+        logging.info("Gif successfully uploaded for post " + post.title)
+    except Exception as ex:
+        logging.warning('post_picture: failed to send gif: ' + str(ex))
+
 
 
 def get_new_post():
@@ -84,8 +97,10 @@ def main():
 
     while True:
         try:
+            # post_text(Post(title="Hello!", text="world!"))
             p = Post.from_url("https://pikabu.ru/story/nemnozhko_tekhnoporno_vam_v_lentu_kak_quotbreyutquot_metall_6195180")
-            post_text(p)
+            post_gif(p)
+            exit(0)
             # list = get_list_of_championat_urls()
             # latest_championat_article_url = list[0]
             # if latest_championat_article_url != latest_post_article:

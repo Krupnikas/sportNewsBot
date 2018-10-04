@@ -7,15 +7,19 @@ import logging
 
 ChampionatUrlIdentifier = 'championat.com'
 PikabuUrlIdentifier = 'pikabu.ru'
+
 ChampionatTitlePath = "/html/body/div[5]/div[5]/div[1]/article/header/h1"
 ChampionatSubtitlePath = "/html/body/div[5]/div[5]/div[1]/article/header/div[3]"
 ChampionatArticlePath = "/html/body/div[5]/div[5]/div[1]/article/div"
 
+TempGifFile = "temp.gif"
+
 class Post:
-    def __init__(self, header, text, picture_file=''):
-        self.header = emojize(header, use_aliases=True)
+    def __init__(self, title, text="", picture_file='', gif_file=''):
+        self.title = emojize(title, use_aliases=True)
         self.text = emojize(text, use_aliases=True)
         self.pictureFile = picture_file
+        self.gifFile = gif_file
 
     @classmethod
     def from_url(cls, url):
@@ -115,10 +119,18 @@ class Post:
 
         gif_url = gif_url.split(" ")[0]
 
+        logging.debug("Title: \t" + title)
+        logging.debug("Gif url: \t" + gif_url)
 
-        print("Titile: "   + title)
-        print("Gif url: " + gif_url)
+        import shutil
 
-        exit(0)
+        logging.info("Downloading gif for post \t" + title)
 
-        return Post(title, text)
+        response = requests.get(gif_url, stream=True)
+        with open(TempGifFile, 'wb') as out_file:
+            shutil.copyfileobj(response.raw, out_file)
+        del response
+
+        logging.info("Downloading gif for post \t" + title + "done")
+
+        return Post(title=title, gif_file=TempGifFile)
