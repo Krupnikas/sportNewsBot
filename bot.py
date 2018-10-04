@@ -7,7 +7,7 @@ from postClass import *
 # me = singleton.SingleInstance()
 
 PostOnStartUp = True
-NewsCheckPeriod = 60    # seconds
+NewsCheckPeriod = 5 * 60    # seconds
 
 TOKEN = '582293326:AAG-1JSt4WHDXE9kMu4KFs7pghcIWKFdFE0'
 
