@@ -6,7 +6,7 @@ from postClass import *
 # from tendo import singleton
 # me = singleton.SingleInstance()
 
-PostOnStartUp = True
+PostOnStartUp = False
 NewsCheckPeriod = 5 * 60    # seconds
 
 TOKEN = '582293326:AAG-1JSt4WHDXE9kMu4KFs7pghcIWKFdFE0'
@@ -14,12 +14,13 @@ TOKEN = '582293326:AAG-1JSt4WHDXE9kMu4KFs7pghcIWKFdFE0'
 FootballChannelId = -1001392228565
 GifChannelId = -1001327157181
 ChannelId = GifChannelId
+# ChannelId = FootballChannelId
 
 BoldPrefix = '<b>'
 BoldPostfix = '</b>'
 
 ChampionatMainUrl = "https://www.championat.com/football/_worldcup.html"
-PikabuMainUrl = "https://pikabu.ru/tag/Гифка?r=5&d=0&D=40000"
+PikabuMainUrl = "https://pikabu.ru/tag/Гифка?r=4&d=0&D=40000"
 TestUrl = "https://www.championat.com/football/article-3374347-fifa-prodaet-bilety-na-chempionat-mira-po-futbolu-v-rossii-v-2018-godu.html"#"https://www.championat.com/football/article-3375221-chm-2018-kakie-anglijskie-futbolnye-terminy-nado-znat-bolelschiku.html"#'https://www.championat.com/football/article-3374095-denis-cheryshev-vpervye-vyzvan-stanislavom-cherchesovym-v-sbornuju-rossii.html'
 
 bot = telegram.Bot(token=TOKEN)
@@ -43,14 +44,14 @@ def post_text(post):
 
 def post_picture(picture_file, caption=''):
     try:
-        bot.sendPhoto(ChannelId, photo=open(picture_file, 'rb'), caption=caption)
+        bot.sendDocument(ChannelId, document=open(picture_file, 'rb'), caption=caption)
     except Exception as ex:
         logging.warning('post_picture: failed to send photo: ' + str(ex))
 
 def post_gif(post):
     try:
         logging.info("Started gif upload for post " + post.title + "...")
-        bot.send_video(ChannelId, video=open(post.gifFile, 'rb'), caption=post.title, timeout=180)
+        bot.send_video(ChannelId, video=post.gif_url, caption=post.title, timeout=180)
         logging.info("Gif successfully uploaded for post " + post.title)
     except Exception as ex:
         logging.warning('post_picture: failed to send gif: ' + str(ex))
@@ -122,7 +123,7 @@ def main():
     if PostOnStartUp:
         latest_post_url = ""
     else:
-        latest_post_url = get_list_of_championat_urls()[0]
+        latest_post_url = get_list_of_pikabu_urls()[0]
 
 
     # for link in reversed(get_list_of_pikabu_urls()):
