@@ -6,7 +6,7 @@ from postClass import *
 # from tendo import singleton
 # me = singleton.SingleInstance()
 
-PostOnStartUp = False
+PostOnStartUp = True
 NewsCheckPeriod = 60    # seconds
 
 TOKEN = '582293326:AAG-1JSt4WHDXE9kMu4KFs7pghcIWKFdFE0'
@@ -68,8 +68,8 @@ def get_list_of_championat_urls():
         if 'article-' in str_link and str_link not in articles:
             articles.append(str_link)
 
-    logging.debug("Articles:")
-    logging.debug("\n".join(articles))
+    logging.info("Articles:")
+    logging.info("\n".join(articles))
 
     return articles
 
@@ -81,12 +81,17 @@ def main():
     else:
         latest_post_article = get_list_of_championat_urls()[0]
 
+
     while True:
         try:
-            latest_championat_article_url = get_list_of_championat_urls()[0]
-            if latest_championat_article_url != latest_post_article:
-                latest_post_article = latest_championat_article_url
-                post_text(Post.from_url(latest_post_article))
+            p = Post.from_url("https://pikabu.ru/story/nemnozhko_tekhnoporno_vam_v_lentu_kak_quotbreyutquot_metall_6195180")
+            post_text(p)
+            # list = get_list_of_championat_urls()
+            # latest_championat_article_url = list[0]
+            # if latest_championat_article_url != latest_post_article:
+            #     latest_post_article = latest_championat_article_url
+            #     p = Post.from_url(latest_post_article)
+            #     post_text(p)
         except Exception as ex:
             print('main: exception: ' + str(ex))
         sleep(NewsCheckPeriod)
