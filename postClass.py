@@ -114,8 +114,16 @@ class Post:
         match = re.search('<title>(.*?)</title>', raw_html)
         title = unescape(match.group(1) if match else '')
 
+        if "pikabu" in title.lower():
+            logging.warning("Lol, pikabu post detected and dropped")
+            return None
+
         match = re.search('data-source="(.*.gif?)"', raw_html)
         gif_url = match.group(1) if match else ''
+
+        if len(gif_url) == 0:
+            logging.warning("Empty gif url")
+            return None
 
         gif_url = gif_url.split(" ")[0]
 
@@ -124,13 +132,14 @@ class Post:
 
         import shutil
 
-        logging.info("Downloading gif for post \t" + title)
+        logging.info("Downloading gif for post \t" + title + "...")
 
-        response = requests.get(gif_url, stream=True)
-        with open(TempGifFile, 'wb') as out_file:
-            shutil.copyfileobj(response.raw, out_file)
-        del response
+        if gif_url:
+            response = requests.get(gif_url, stream=True)
+            with open(TempGifFile, 'wb') as out_file:
+                shutil.copyfileobj(response.raw, out_file)
+            del response
 
-        logging.info("Downloading gif for post \t" + title + "done")
+        logging.info("Downloading gif for post \t" + title + " done")
 
         return Post(title=title, gif_file=TempGifFile)

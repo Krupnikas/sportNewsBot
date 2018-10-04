@@ -19,6 +19,7 @@ BoldPrefix = '<b>'
 BoldPostfix = '</b>'
 
 ChampionatMainUrl = "https://www.championat.com/football/_worldcup.html"
+PikabuMainUrl = "https://pikabu.ru/tag/Гифка?r=5&d=0&D=40000"
 TestUrl = "https://www.championat.com/football/article-3374347-fifa-prodaet-bilety-na-chempionat-mira-po-futbolu-v-rossii-v-2018-godu.html"#"https://www.championat.com/football/article-3375221-chm-2018-kakie-anglijskie-futbolnye-terminy-nado-znat-bolelschiku.html"#'https://www.championat.com/football/article-3374095-denis-cheryshev-vpervye-vyzvan-stanislavom-cherchesovym-v-sbornuju-rossii.html'
 
 bot = telegram.Bot(token=TOKEN)
@@ -49,7 +50,7 @@ def post_picture(picture_file, caption=''):
 def post_gif(post):
     try:
         logging.info("Started gif upload for post " + post.title + "...")
-        bot.send_video(ChannelId, video=open(post.gifFile, 'rb'), caption=post.title, timeout=60)
+        bot.send_video(ChannelId, video=open(post.gifFile, 'rb'), caption=post.title, timeout=180)
         logging.info("Gif successfully uploaded for post " + post.title)
     except Exception as ex:
         logging.warning('post_picture: failed to send gif: ' + str(ex))
@@ -86,21 +87,57 @@ def get_list_of_championat_urls():
 
     return articles
 
+def get_list_of_pikabu_urls():
+    try:
+        response = requests.get(url=PikabuMainUrl)
+    except Exception as ex:
+        logging.warning("get_list_of_championat_urls: exception: " + str(ex))
+        return []
+
+    if response.status_code != 200:
+        logging.warning("get_list_of_championat_urls: wrong responce code: " + str(response.status_code))
+        return []
+
+    root = html.fromstring(response.content)
+    links = root.cssselect('a')
+
+    articles = []
+
+    for link in links:
+        str_link = str(link.get('href'))
+        if 'https://pikabu.ru/story/' in str_link \
+            and str_link not in articles \
+            and "#comments" not in str_link \
+            and "?cid=" not in str_link:
+            articles.append(str_link)
+
+    logging.info("Articles:")
+    logging.info("\n".join(articles))
+
+    return articles
+
 
 def main():
 
     if PostOnStartUp:
-        latest_post_article = ""
+        latest_post_url = ""
     else:
-        latest_post_article = get_list_of_championat_urls()[0]
+        latest_post_url = get_list_of_championat_urls()[0]
 
+
+    # for link in reversed(get_list_of_pikabu_urls()):
+    #     print(link)
+    #     p = Post.from_url(link)
+    #     post_gif(p)
+    # exit(0)
 
     while True:
         try:
-            # post_text(Post(title="Hello!", text="world!"))
-            p = Post.from_url("https://pikabu.ru/story/nemnozhko_tekhnoporno_vam_v_lentu_kak_quotbreyutquot_metall_6195180")
-            post_gif(p)
-            exit(0)
+            list_of_urls = get_list_of_pikabu_urls()
+            if latest_post_url != list_of_urls[0]:
+                latest_post_url = list_of_urls[0]
+                p = Post.from_url(latest_post_url)
+                post_gif(p)
             # list = get_list_of_championat_urls()
             # latest_championat_article_url = list[0]
             # if latest_championat_article_url != latest_post_article:
