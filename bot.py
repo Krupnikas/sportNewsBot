@@ -20,7 +20,7 @@ BoldPrefix = '<b>'
 BoldPostfix = '</b>'
 
 ChampionatMainUrl = "https://www.championat.com/football/_worldcup.html"
-PikabuMainUrl = "https://pikabu.ru/tag/Гифка?r=4&d=0&D=40000"
+PikabuMainUrl = "https://pikabu.ru/tag/Гифка?r=3&d=0&D=40000"
 TestUrl = "https://www.championat.com/football/article-3374347-fifa-prodaet-bilety-na-chempionat-mira-po-futbolu-v-rossii-v-2018-godu.html"#"https://www.championat.com/football/article-3375221-chm-2018-kakie-anglijskie-futbolnye-terminy-nado-znat-bolelschiku.html"#'https://www.championat.com/football/article-3374095-denis-cheryshev-vpervye-vyzvan-stanislavom-cherchesovym-v-sbornuju-rossii.html'
 
 bot = telegram.Bot(token=TOKEN)
