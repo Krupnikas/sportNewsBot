@@ -114,7 +114,47 @@ class Post:
         match = re.search('<title>(.*?)</title>', raw_html)
         title = unescape(match.group(1) if match else '')
 
-        if "pikabu" in title.lower():
+        if "pikabu" in title.lower() or "пикабу" in title.lower() or "модератор" in title.lower():
+            logging.warning("Lol, pikabu post detected and dropped")
+            return None
+
+        match = re.search('data-source="(.*.gif?)"', raw_html)
+        gif_url = match.group(1) if match else ''
+
+        if len(gif_url) == 0:
+            logging.warning("Empty gif url")
+            return None
+
+        gif_url = gif_url.split(" ")[0]
+
+        logging.info("Title: \t" + title)
+        logging.info("Gif url: \t" + gif_url)
+
+        if not gif_url:
+            return None
+
+        return Post(title=title, gif_url=gif_url)
+
+    @classmethod
+    def photopost_from_pikabu_url(cls, url):
+
+        try:
+            response = requests.get(url=url)
+        except Exception as ex:
+            logging.warning("Post: from_url: exception: " + str(ex))
+            return None
+
+        if response.status_code != 200:
+            logging.warning("Post: from_url: wrong responce code: " + str(response.status_code))
+            return None
+
+        raw_html  = response.content.decode("cp1251")
+
+        import re
+        match = re.search('<title>(.*?)</title>', raw_html)
+        title = unescape(match.group(1) if match else '')
+
+        if "pikabu" in title.lower() or "пикабу" in title.lower() or "модератор" in title.lower():
             logging.warning("Lol, pikabu post detected and dropped")
             return None
 

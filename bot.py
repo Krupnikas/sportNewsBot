@@ -14,13 +14,16 @@ TOKEN = '582293326:AAG-1JSt4WHDXE9kMu4KFs7pghcIWKFdFE0'
 FootballChannelId = -1001392228565
 GifChannelId = -1001327157181
 ChannelId = GifChannelId
-# ChannelId = FootballChannelId
+#ChannelId = FootballChannelId
 
 BoldPrefix = '<b>'
 BoldPostfix = '</b>'
 
+MemesQuality = 3
+
 ChampionatMainUrl = "https://www.championat.com/football/_worldcup.html"
-PikabuMainUrl = "https://pikabu.ru/tag/Гифка?r=3&d=0&D=40000"
+PikabuGifUrl    = "https://pikabu.ru/tag/Гифка?r="   + str(MemesQuality) + "&d=0&D=40000"
+PikabuComicsUrl = "https://pikabu.ru/tag/Комиксы?r=" + str(MemesQuality) + "&d=0&D=40000"
 TestUrl = "https://www.championat.com/football/article-3374347-fifa-prodaet-bilety-na-chempionat-mira-po-futbolu-v-rossii-v-2018-godu.html"#"https://www.championat.com/football/article-3375221-chm-2018-kakie-anglijskie-futbolnye-terminy-nado-znat-bolelschiku.html"#'https://www.championat.com/football/article-3374095-denis-cheryshev-vpervye-vyzvan-stanislavom-cherchesovym-v-sbornuju-rossii.html'
 
 bot = telegram.Bot(token=TOKEN)
@@ -42,9 +45,9 @@ def post_text(post):
         logging.warning('post_text: exception: ' + str(ex))
 
 
-def post_picture(picture_file, caption=''):
+def post_picture(picture_url, caption=''):
     try:
-        bot.sendDocument(ChannelId, document=open(picture_file, 'rb'), caption=caption)
+        bot.sendPhoto(ChannelId, photo=picture_url, caption=caption, timeout=180)
     except Exception as ex:
         logging.warning('post_picture: failed to send photo: ' + str(ex))
 
@@ -90,7 +93,7 @@ def get_list_of_championat_urls():
 
 def get_list_of_pikabu_urls():
     try:
-        response = requests.get(url=PikabuMainUrl)
+        response = requests.get(url=PikabuGifUrl)
     except Exception as ex:
         logging.warning("get_list_of_championat_urls: exception: " + str(ex))
         return []
@@ -131,6 +134,9 @@ def main():
     #     p = Post.from_url(link)
     #     post_gif(p)
     # exit(0)
+
+#    post_picture("https://cs10.pikabu.ru/post_img/2018/10/15/8/1539609298142082715.jpg","Test")
+#    exit(0)
 
     while True:
         try:
