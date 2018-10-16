@@ -129,7 +129,7 @@ def main():
         latest_comics_url = ""
     else:
         latest_post_url = get_list_of_pikabu_urls(PikabuGifUrl)[0]
-        latest_comics_url = get_list_of_pikabu_comics_urls(PikabuComicsUrl)[0]
+        latest_comics_url = get_list_of_pikabu_urls(PikabuComicsUrl)[0]
 
 
     # for link in reversed(get_list_of_pikabu_urls()):
