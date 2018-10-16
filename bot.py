@@ -47,6 +47,7 @@ def post_text(post):
 
 def post_picture(picture_url, caption=''):
     try:
+        print(picture_url)
         bot.sendPhoto(ChannelId, photo=picture_url, caption=caption, timeout=180)
     except Exception as ex:
         logging.warning('post_picture: failed to send photo: ' + str(ex))
@@ -91,9 +92,9 @@ def get_list_of_championat_urls():
 
     return articles
 
-def get_list_of_pikabu_urls():
+def get_list_of_pikabu_urls(url):
     try:
-        response = requests.get(url=PikabuGifUrl)
+        response = requests.get(url=url)
     except Exception as ex:
         logging.warning("get_list_of_championat_urls: exception: " + str(ex))
         return []
@@ -125,8 +126,10 @@ def main():
 
     if PostOnStartUp:
         latest_post_url = ""
+        latest_comics_url = ""
     else:
-        latest_post_url = get_list_of_pikabu_urls()[0]
+        latest_post_url = get_list_of_pikabu_urls(PikabuGifUrl)[0]
+        latest_comics_url = get_list_of_pikabu_comics_urls(PikabuComicsUrl)[0]
 
 
     # for link in reversed(get_list_of_pikabu_urls()):
@@ -140,11 +143,16 @@ def main():
 
     while True:
         try:
-            list_of_urls = get_list_of_pikabu_urls()
+            list_of_urls = get_list_of_pikabu_urls(PikabuGifUrl)
             if latest_post_url != list_of_urls[0]:
                 latest_post_url = list_of_urls[0]
                 p = Post.from_url(latest_post_url)
                 post_gif(p)
+            list_of_urls = get_list_of_pikabu_urls(PikabuComicsUrl)
+            if latest_comics_url != list_of_urls[0]:
+                latest_comics_url = list_of_urls[0]
+                p = Post.picture_from_pikabu_url(latest_comics_url)
+                post_picture(picture_url = p.url, caption = p.title)
             # list = get_list_of_championat_urls()
             # latest_championat_article_url = list[0]
             # if latest_championat_article_url != latest_post_article:

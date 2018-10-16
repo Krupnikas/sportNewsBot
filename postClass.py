@@ -15,11 +15,12 @@ ChampionatArticlePath = "/html/body/div[5]/div[5]/div[1]/article/div"
 TempGifFile = "temp.gif"
 
 class Post:
-    def __init__(self, title, text="", picture_file='', gif_url=''):
+    def __init__(self, title, text="", picture_file='', gif_url='', url=''):
         self.title = emojize(title, use_aliases=True)
         self.text = emojize(text, use_aliases=True)
         self.pictureFile = picture_file
         self.gif_url = gif_url
+        self.url = url
 
     @classmethod
     def from_url(cls, url):
@@ -136,7 +137,7 @@ class Post:
         return Post(title=title, gif_url=gif_url)
 
     @classmethod
-    def photopost_from_pikabu_url(cls, url):
+    def picture_from_pikabu_url(cls, url):
 
         try:
             response = requests.get(url=url)
@@ -158,19 +159,19 @@ class Post:
             logging.warning("Lol, pikabu post detected and dropped")
             return None
 
-        match = re.search('data-source="(.*.gif?)"', raw_html)
-        gif_url = match.group(1) if match else ''
+        match = re.search('<div class="story-image__content"><a href="(.*.jpg)"', raw_html)
+        picture_url = match.group(1) if match else ''
 
-        if len(gif_url) == 0:
+        if len(picture_url) == 0:
             logging.warning("Empty gif url")
             return None
 
-        gif_url = gif_url.split(" ")[0]
+        picture_url = picture_url.split('"')[0]
 
         logging.info("Title: \t" + title)
-        logging.info("Gif url: \t" + gif_url)
+        logging.info("Picture url: \t" + picture_url)
 
-        if not gif_url:
+        if not picture_url:
             return None
 
-        return Post(title=title, gif_url=gif_url)
+        return Post(title=title, url=picture_url)
