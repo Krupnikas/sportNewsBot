@@ -4,6 +4,7 @@ from lxml import html
 from html import unescape
 import requests
 import logging
+import bs4
 
 ChampionatUrlIdentifier = 'championat.com'
 PikabuUrlIdentifier = 'pikabu.ru'
@@ -15,11 +16,12 @@ ChampionatArticlePath = "/html/body/div[5]/div[5]/div[1]/article/div"
 TempGifFile = "temp.gif"
 
 class Post:
-    def __init__(self, title, text="", picture_file='', gif_url=''):
-        self.title = emojize(title, use_aliases=True)
-        self.text = emojize(text, use_aliases=True)
+    def __init__(self, title, text="", picture_file='', gif_url='', tags = []):
+        self.title = title #emojize(title, use_aliases=True)
+        self.text = text #emojize(text, use_aliases=True)
         self.pictureFile = picture_file
         self.gif_url = gif_url
+        self.tags = tags
 
     @classmethod
     def from_url(cls, url):
@@ -108,29 +110,43 @@ class Post:
             logging.warning("Post: from_url: wrong responce code: " + str(response.status_code))
             return None
 
-        raw_html  = response.content.decode("cp1251")
+        soup = bs4.BeautifulSoup(response.text)
+        print(soup.prettify())
 
-        import re
-        match = re.search('<title>(.*?)</title>', raw_html)
-        title = unescape(match.group(1) if match else '')
+        # raw_html  = response.content.decode("cp1251")
+        #
+        # import re
+        # match = re.search('<title>(.*?)</title>', raw_html)
+        # title = unescape(match.group(1) if match else '')
+        #
+        # if "pikabu" in title.lower():
+        #     logging.warning("Lol, pikabu post detected and dropped")
+        #     return None
+        #
+        # match = re.search('data-source="(.*.gif?)"', raw_html)
+        # gif_url = match.group(1) if match else ''
+        #
+        # if len(gif_url) == 0:
+        #     logging.warning("Empty gif url")
+        #     return None
+        #
+        # gif_url = gif_url.split(" ")[0]
+        #
+        # MBFACTOR = float(1 << 20)
+        #
+        # response = requests.head(gif_url, allow_redirects=True)
+        # size = response.headers.get('content-length', 0)
+        # logging.info("Gif size: " + str(int(size)/MBFACTOR) + "Mb")
+        #
+        # if int(size) / MBFACTOR > 10:
+        #     logging.warning("Too big gif. Dropped")
+        #     return None
+        #
+        # logging.info("Title: \t" + title)
+        # logging.info("Gif url: \t" + gif_url)
+        #
+        # if not gif_url:
+        #     return None
+        #
+        # return Post(title=title, gif_url=gif_url, text="")
 
-        if "pikabu" in title.lower():
-            logging.warning("Lol, pikabu post detected and dropped")
-            return None
-
-        match = re.search('data-source="(.*.gif?)"', raw_html)
-        gif_url = match.group(1) if match else ''
-
-        if len(gif_url) == 0:
-            logging.warning("Empty gif url")
-            return None
-
-        gif_url = gif_url.split(" ")[0]
-
-        logging.info("Title: \t" + title)
-        logging.info("Gif url: \t" + gif_url)
-
-        if not gif_url:
-            return None
-
-        return Post(title=title, gif_url=gif_url)
