@@ -153,15 +153,15 @@ def get_multiple_posts(url):
     return parsed_posts
 
 
-def authentificate_in_yandex_zen():
-
-    global driver
+def authentificate_in_yandex_zen(driver = None):
 
     login = "krupnik35"
     print(f"Password for {login}: ")
     password = "Klazklaz37"  # input()
 
-    driver = webdriver.Chrome()
+    if driver is None:
+        driver = webdriver.Chrome()
+
     driver.get(
         "https://passport.yandex.ru/auth?origin=zen&retpath=https%3A%2F%2Fzen.yandex.ru%2Fid%2F5c8ce13954593600b40ba8e4")
     login_field = driver.find_element_by_id("passp-field-login")
@@ -179,12 +179,14 @@ def authentificate_in_yandex_zen():
 
 def post_to_yandex_zen(post):
 
+    global driver
+
     print(post.title, post.gif_url, post.text)
     # exit(0)
 
     #Auth
     if driver is None:
-        authentificate_in_yandex_zen()
+        authentificate_in_yandex_zen(driver)
 
     #Preparing
     # driver.get("https://zen.yandex.ru/profile/editor/id/5c8ce13954593600b40ba8e4")
@@ -245,6 +247,8 @@ def post_to_yandex_zen(post):
 
 def multiple_post_to_yandex_zen(posts):
 
+    global driver
+
     print(f"Posting {len(posts)} posts")
     #preparing Data
     tags = {}
@@ -266,7 +270,7 @@ def multiple_post_to_yandex_zen(posts):
 
     # Auth
     if driver is None:
-        authentificate_in_yandex_zen()
+        authentificate_in_yandex_zen(driver)
 
     # Preparing
     # driver.get("https://zen.yandex.ru/profile/editor/id/5c8ce13954593600b40ba8e4")
