@@ -16,7 +16,7 @@ import bs4
 PostOnStartUp = False
 NewsCheckPeriod = 5 * 60    # seconds
 
-ArticlePostTimeMoscowOffset = 19.00  # Hours 19:00 Moscow UTC+3
+ArticlePostTimeMoscowOffset = 16.00  # Hours 19:00 Moscow UTC+3
 ArticlePostTimeUtcOffsetSeconds = (ArticlePostTimeMoscowOffset - 3) * 60 * 60
 
 LastPostDay = 0
@@ -205,6 +205,7 @@ def post_to_yandex_zen(post):
 
     # Article creation
     actions = ActionChains(driver)
+    actions.reset_actions()
     actions.send_keys(post.text)
     actions.perform()
     sleep(1)
@@ -213,6 +214,7 @@ def post_to_yandex_zen(post):
     title_field.click()
     sleep(1)
     actions = ActionChains(driver)
+    actions.reset_actions()
     actions.send_keys(post.title)
     actions.perform()
     sleep(1)
@@ -224,6 +226,7 @@ def post_to_yandex_zen(post):
     link_field = driver.find_element_by_css_selector(".image-popup__url-input")
     pyperclip.copy(post.gif_url)
     actions = ActionChains(driver)
+    actions.reset_actions()
     actions.send_keys(Keys.SHIFT, Keys.INSERT)
     actions.perform()
     sleep(1)
@@ -293,6 +296,7 @@ def multiple_post_to_yandex_zen(posts):
     title_field.click()
     sleep(1.5)
     actions = ActionChains(driver)
+    actions.reset_actions()
     actions.send_keys(title)
     actions.perform()
     sleep(1.1)
@@ -328,6 +332,8 @@ def multiple_post_to_yandex_zen(posts):
         #     actions.perform()
         #     sleep(2)
 
+        before_images_num = len(driver.find_elements_by_css_selector(".zen-editor-block-image__image"))
+
         if attachment_button is None:
             attachment_button = driver.find_element_by_css_selector(".side-button_logo_image")
         attachment_button.click()
@@ -336,32 +342,83 @@ def multiple_post_to_yandex_zen(posts):
         link_field = driver.find_element_by_css_selector(".image-popup__url-input")
         pyperclip.copy(post.gif_url)
         actions = ActionChains(driver)
-        actions.send_keys(Keys.SHIFT, Keys.INSERT)
+        actions.reset_actions()
+        # actions.send_keys(Keys.SHIFT, Keys.INSERT)
+        actions.key_up(Keys.SHIFT).key_up(Keys.INSERT)
         actions.perform()
+        actions = None
         sleep(1)
 
         try:
             while True:
+
+                images_num = len(driver.find_elements_by_css_selector(".zen-editor-block-image__image"))
+                if images_num > before_images_num:
+                    print("Posted!")
+                    break
+
+                print("Trying to post")
                 link_field = driver.find_element_by_css_selector(".image-popup__url-input")
                 pyperclip.copy(post.gif_url)
                 actions = ActionChains(driver)
-                actions.send_keys(Keys.SHIFT, Keys.INSERT)
+                actions.reset_actions()
+                # actions.send_keys(Keys.SHIFT, Keys.INSERT)
+                actions.key_up(Keys.SHIFT).key_up(Keys.INSERT)
                 actions.perform()
+                actions = None
                 sleep(1)
+
         except Exception as e:
             print("Worked before")
 
+        if post != posts[-1]:
+            sleep(2)
+
+    sleep(1)
+
+    captions = driver.find_elements_by_css_selector(".zen-editor-block-image__caption")
+    print(f"Captions num: {len(captions)}")
+
+    for i, caption in enumerate(captions):
+        caption.click()
+        sleep(1)
+
+        pyperclip.copy(posts[i].title)
+
+        actions = ActionChains(driver)
+        actions.send_keys(Keys.ARROW_LEFT)
+        actions.pause(1)
+        actions.send_keys(Keys.SHIFT, Keys.INSERT)
+        actions.key_up(Keys.SHIFT).key_up(Keys.INSERT)
+        actions.perform()
         sleep(5)
 
-    for i in range(len(posts)):
-        print(f"Going up {i}")
-        actions = ActionChains(driver)
-        actions.send_keys(Keys.ARROW_UP)
-        actions.send_keys(Keys.ARROW_UP)
-        actions.send_keys(Keys.ARROW_UP)
-        actions.send_keys(str(i))
-        actions.perform()
-        sleep(1)
+
+    # text_edit_field = driver.find_elements_by_css_selector(".zen-editor-block-image__caption")[-1]
+    # text_edit_field.click()
+    # #
+    # # actions.key_up(Keys.SHIFT).key_up(Keys.INSERT)
+    #
+    # print(f'Posts: {len(driver.find_elements_by_css_selector(".public-DraftStyleDefault-block.public-DraftStyleDefault-ltr"))}')
+    #
+
+    # for i in range(len(posts)):
+    #     print(f"Going up {i} printing {posts[::-1][i].title}")
+    #     pyperclip.copy(posts[::-1][i].title)
+    #     actions = ActionChains(driver)
+    #     actions.reset_actions()
+    #     actions.send_keys(Keys.CONTROL, Keys.ARROW_UP)
+    #     actions.pause(1)
+    #     if i > 0:
+    #         actions.send_keys(Keys.CONTROL, Keys.ARROW_UP)
+    #         actions.pause(1)
+    #         actions.send_keys(Keys.CONTROL, Keys.ARROW_UP)
+    #         actions.pause(1)
+    #     actions.send_keys(Keys.SHIFT, Keys.INSERT)
+    #     actions.key_up(Keys.SHIFT).key_up(Keys.INSERT)
+    #     actions.send_keys(Keys.HOME)
+    #     actions.perform()
+    #     sleep(1)
 
 
 def main():
@@ -411,7 +468,7 @@ def main():
                 raiting = 6
                 pikaUrl = f"https://pikabu.ru/tag/Гифка?r={raiting}&d={pikaDay}&D={pikaDay}"
                 posts = get_multiple_posts(pikaUrl)
-                multiple_post_to_yandex_zen(posts)
+                multiple_post_to_yandex_zen(posts[:3])
 
             except Exception as ex:
                 print('main: exception: ' + str(ex))
