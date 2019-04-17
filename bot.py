@@ -21,7 +21,7 @@ chrome_options = Options()
 PostOnStartUp = False
 NewsCheckPeriod = 5 * 60    # seconds
 
-ArticlePostTimeMoscowOffset = 16.00  # Hours 19:00 Moscow UTC+3
+ArticlePostTimeMoscowOffset = 19.00  # Hours 19:00 Moscow UTC+3
 ArticlePostTimeUtcOffsetSeconds = (ArticlePostTimeMoscowOffset - 3) * 60 * 60
 
 LastPostDay = 0
@@ -36,7 +36,7 @@ tag_black_list = ['reddit', '[моё]', 'длиннопост']
 titles = ["Подборка интересных гифок на вечер",
           "Самые интересные гифки за сегодня",
           "Свежая подборка гифок",
-          "Итоги для в гифках",
+          "Итоги дня в гифках",
           "Гифки это божественно!",
           "Подборка свежайших гифок"]
 
@@ -165,7 +165,7 @@ def get_multiple_posts(url):
         if title[0] == "-":
             title = title[1:]
 
-        if 'часть' in title.lower():
+        if 'часть' in title.lower() or 'фотографии' in title.lower():
             logging.warning(f"Часть. Post dropped")
             continue
 
