@@ -314,8 +314,9 @@ def add_gif_caption(driver, index, caption):
 
     print(f"Creating caption {index} {caption}")
     ActionChains(driver).move_to_element(captions[index]).pause(2).move_to_element(
-        captions[index]).pause(2).click().pause(2).click().perform()
-    sleep(1)
+        captions[index]).pause(2).click().perform()
+    sleep(5)
+    # ActionChains(driver).send_keys(Keys.SHIFT, Keys.INSERT).perform()
     ActionChains(driver).key_down(Keys.SHIFT).send_keys(Keys.INSERT).key_up(Keys.SHIFT).perform()
     sleep(1)
 
@@ -349,8 +350,9 @@ def publish(driver, tags, description):
 
 
 def scroll_to_top(driver):
-    ActionChains(driver).key_down(Keys.PAGE_UP).pause(3).key_up(Keys.PAGE_UP).perform()
-    sleep(1)
+    # ActionChains(driver).key_down(Keys.PAGE_UP).pause(5).key_up(Keys.PAGE_UP).perform()
+    ActionChains(driver).key_down(Keys.CONTROL).send_keys(Keys.HOME).key_up(Keys.CONTROL).perform()
+    sleep(5)
 
 
 def multiple_post_to_yandex_zen(posts):
@@ -361,8 +363,11 @@ def multiple_post_to_yandex_zen(posts):
     tags = {}
     for post in posts:
         for tag in post.tags:
-            if tag not in tags.keys():  # and tag not in tag_black_list:
-                tags[tag] = 1
+            if tag not in tags.keys():
+                if tag not in tag_black_list:
+                    tags[tag] = 1
+                else:
+                    print(f"Tag {tag} from black list dropped")
             else:
                 tags[tag] += 1
     tags = sorted(tags.items(), key=lambda kv: -kv[1])
@@ -433,7 +438,7 @@ def main():
             print("It's time to post!")
             LastPostDay = day
             try:
-                pikaDay = day - 17980 + 4101 - 4
+                pikaDay = day - 17980 + 4101 - 5
                 raiting = 6
                 pikaUrl = f"https://pikabu.ru/tag/Гифка?r={raiting}&d={pikaDay}&D={pikaDay}"
                 posts = get_multiple_posts(pikaUrl)
