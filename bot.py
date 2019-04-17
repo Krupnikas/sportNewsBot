@@ -2,6 +2,7 @@ import telegram
 import os
 from time import sleep
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import pyperclip
@@ -14,10 +15,13 @@ import random
 # from tendo import singleton
 # me = singleton.SingleInstance()
 
+chrome_options = Options()
+# chrome_options.add_argument("--headless")
+
 PostOnStartUp = False
 NewsCheckPeriod = 5 * 60    # seconds
 
-ArticlePostTimeMoscowOffset = 14.00  # Hours 19:00 Moscow UTC+3
+ArticlePostTimeMoscowOffset = 16.00  # Hours 19:00 Moscow UTC+3
 ArticlePostTimeUtcOffsetSeconds = (ArticlePostTimeMoscowOffset - 3) * 60 * 60
 
 LastPostDay = 0
@@ -27,7 +31,8 @@ TOKEN = '582293326:AAG-1JSt4WHDXE9kMu4KFs7pghcIWKFdFE0'
 postedLinksFilename = "posted.csv"
 postedLinks = []
 
-tag_black_list = ['reddit']
+tag_black_list = ['reddit', '[моё]', 'длиннопост']
+
 titles = ["Подборка интересных гифок на вечер",
           "Самые интересные гифки за сегодня",
           "Свежая подборка гифок",
@@ -144,8 +149,10 @@ def get_multiple_posts(url):
     for post in posts:
         # print(post)
         player = post.find("div", {"class": "player"})
-        if player is None:
-            logging.warning(f"Post dropped. No player element")
+        amount = len(post.findAll("div", {"class": "player"}))
+        logging.debug(f"Players amount: {amount}")
+        if amount != 1:
+            logging.warning(f"Post dropped. Wrong player ammount {amount}")
             continue
         gif_url = player['data-source']
         if ".gif" not in gif_url:
@@ -157,6 +164,11 @@ def get_multiple_posts(url):
         title = post.find("h2", {"class": "story__title"}).text.strip()
         if title[0] == "-":
             title = title[1:]
+
+        if 'часть' in title.lower():
+            logging.warning(f"Часть. Post dropped")
+            continue
+
         tags = [tag.text.lower() for tag in post.findAll("a", {"class": "tags__tag"})]
         parsed_posts.append(Post(title, gif_url=gif_url, tags=tags))
 
@@ -170,7 +182,7 @@ def authentificate_in_yandex_zen(driver = None):
     password = "Klazklaz37"  # input()
 
     if driver is None:
-        driver = webdriver.Chrome()
+        driver = webdriver.Chrome(options=chrome_options)
 
     driver.get(
         "https://passport.yandex.ru/auth?origin=zen&retpath=https%3A%2F%2Fzen.yandex.ru%2Fid%2F5c8ce13954593600b40ba8e4")
@@ -382,7 +394,7 @@ def multiple_post_to_yandex_zen(posts):
     print(subtitle)
 
     if driver is None:
-        driver = webdriver.Chrome()
+        driver = webdriver.Chrome(options=chrome_options)
         authentificate_in_yandex_zen(driver)
 
     # Preparing
@@ -438,7 +450,7 @@ def main():
             print("It's time to post!")
             LastPostDay = day
             try:
-                pikaDay = day - 17980 + 4101 - 5
+                pikaDay = day - 17980 + 4101 - 6
                 raiting = 6
                 pikaUrl = f"https://pikabu.ru/tag/Гифка?r={raiting}&d={pikaDay}&D={pikaDay}"
                 posts = get_multiple_posts(pikaUrl)
