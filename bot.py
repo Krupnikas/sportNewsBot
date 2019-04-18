@@ -40,7 +40,6 @@ titles = ["Подборка интересных гифок на вечер",
           "Гифки это божественно!",
           "Подборка свежайших гифок"]
 
-
 driver = None
 
 if os.path.isfile(postedLinksFilename):
@@ -281,7 +280,7 @@ def add_gif_paragraph(driver, url):
             create_new_paragraph(driver, True)
             sleep(1)
             attachment_button = driver.find_element_by_css_selector(".side-button.side-button_logo_image")
-        print(f"Att button: {attachment_button}")
+        # print(f"Att button: {attachment_button}")
         attachment_button.click()
         sleep(1)
     except Exception as e:
@@ -355,10 +354,14 @@ def publish(driver, tags, description):
 
     sleep(1)
 
-    submit_button = driver.find_element_by_css_selector(
-        ".ui-lib-button._size_l._view-type_blue._is-transition-enabled._width-type_regular."
-        "publication-settings-actions__action")
-    ActionChains(driver).move_to_element(submit_button).click().perform()
+    driver.find_element_by_css_selector(".publication-settings-actions__action").click()
+
+    sleep(5)
+    #
+    # submit_button = driver.find_element_by_css_selector(".publication-settings-actions__action").click()
+    # if submit_button is not None:
+    #     print("Trying to submit again")
+    #     ActionChains(driver).move_to_element(submit_button).pause(1).click().pause(1).perform()
 
 
 def scroll_to_top(driver):
@@ -420,12 +423,20 @@ def multiple_post_to_yandex_zen(posts):
     add_text_paragraph(driver, subtitle)
     sleep(1)
 
+    failed_posts = []
+
     for post in posts:
         if not add_gif_paragraph(driver, post.gif_url):
             print(f"Posting failed. Post {post.title} removed")
-            posts.remove(post)
+            failed_posts.append(post)
             continue
         sleep(5)
+
+    for fail in failed_posts:
+        posts.remove(fail)
+
+    print(f"Posted: {len(posts)}")
+    print(f"Failed: {len(failed_posts)}")
 
     scroll_to_top(driver)
 
@@ -434,6 +445,8 @@ def multiple_post_to_yandex_zen(posts):
         sleep(3)
 
     publish(driver, tags, subtitle)
+
+    driver.close()
 
 
 def main():
@@ -448,9 +461,9 @@ def main():
         print(day, offset)
         if day > LastPostDay and offset > ArticlePostTimeUtcOffsetSeconds:
             print("It's time to post!")
-            LastPostDay = day
+            # LastPostDay = day
             try:
-                pikaDay = day - 17980 + 4101
+                pikaDay = day - 17980 + 4101 - 12
                 raiting = 6
                 pikaUrl = f"https://pikabu.ru/tag/Гифка?r={raiting}&d={pikaDay}&D={pikaDay}"
                 posts = get_multiple_posts(pikaUrl)
