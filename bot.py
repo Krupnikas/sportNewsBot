@@ -461,7 +461,7 @@ def main():
         print(day, offset)
         if day > LastPostDay and offset > ArticlePostTimeUtcOffsetSeconds:
             print("It's time to post!")
-            # LastPostDay = day
+            LastPostDay = day
             try:
                 pikaDay = day - 17980 + 4101 - 12
                 raiting = 6
