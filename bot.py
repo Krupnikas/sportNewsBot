@@ -14,6 +14,16 @@ import random
 
 # from tendo import singleton
 # me = singleton.SingleInstance()
+prod = True
+
+if prod:
+    login = "sk@nightone.tech"
+    password = "Klazklaz37"
+    editor_link = "https://zen.yandex.ru/profile/editor/id/5c99341cc56eea00b2639f88"
+else:
+    login = "krupnik35"
+    password = "Klazklaz37"
+    editor_link = "https://zen.yandex.ru/profile/editor/id/5c8ce13954593600b40ba8e4"
 
 chrome_options = Options()
 # chrome_options.add_argument("--headless")
@@ -175,10 +185,6 @@ def get_multiple_posts(url):
 
 
 def authentificate_in_yandex_zen(driver = None):
-
-    login = "krupnik35"
-    print(f"Password for {login}: ")
-    password = "Klazklaz37"  # input()
 
     if driver is None:
         driver = webdriver.Chrome(options=chrome_options)
@@ -402,7 +408,7 @@ def multiple_post_to_yandex_zen(posts):
 
     # Preparing
     # driver.get("https://zen.yandex.ru/profile/editor/id/5c8ce13954593600b40ba8e4")
-    driver.get("https://zen.yandex.ru/profile/editor/id/5c8ce13954593600b40ba8e4")
+    driver.get(editor_link)
     sleep(1.1)
 
     driver.find_element_by_css_selector(".header__add-button").click()
