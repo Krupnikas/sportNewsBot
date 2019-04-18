@@ -463,7 +463,7 @@ def main():
             print("It's time to post!")
             LastPostDay = day
             try:
-                pikaDay = day - 17980 + 4101 - 12
+                pikaDay = day - 17980 + 4101
                 raiting = 6
                 pikaUrl = f"https://pikabu.ru/tag/Гифка?r={raiting}&d={pikaDay}&D={pikaDay}"
                 posts = get_multiple_posts(pikaUrl)
