@@ -10,6 +10,7 @@ from datetime import datetime
 import logging
 from postClass import *
 import bs4
+import sys
 import random
 
 # from tendo import singleton
@@ -458,6 +459,11 @@ def multiple_post_to_yandex_zen(posts, title):
 def main():
 
     global LastPostDay
+
+    if len(sys.argv) == 1:
+        print("Skipping first day. To post run with any argument")
+        t = round(datetime.now().timestamp())
+        LastPostDay = t // (24 * 60 * 60)
 
     while True:
 
