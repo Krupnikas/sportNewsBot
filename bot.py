@@ -376,7 +376,7 @@ def scroll_to_top(driver):
     sleep(5)
 
 
-def multiple_post_to_yandex_zen(posts):
+def multiple_post_to_yandex_zen(posts, title):
 
     global driver
 
@@ -395,11 +395,11 @@ def multiple_post_to_yandex_zen(posts):
     if len(tags) > 10:
         tags = tags[:10]
 
-    title = random.choice(titles)
     subtitle = f"Сегодня у нас {tags[1][0]}, {tags[2][0]}, {tags[3][0]} и {tags[4][0]}!"
 
     tags = [tag[0] for tag in tags]
 
+    print(title)
     print(subtitle)
 
     if driver is None:
@@ -473,7 +473,8 @@ def main():
                 raiting = 6
                 pikaUrl = f"https://pikabu.ru/tag/Гифка?r={raiting}&d={pikaDay}&D={pikaDay}"
                 posts = get_multiple_posts(pikaUrl)
-                multiple_post_to_yandex_zen(posts)
+                # title = random.choice(titles)
+                multiple_post_to_yandex_zen(posts, f"Подборка интересных гифок на вечер №{pikaDay - 4120}" )
 
             except Exception as ex:
                 print('main: exception: ' + str(ex))
