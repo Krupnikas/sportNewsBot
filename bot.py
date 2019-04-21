@@ -403,9 +403,8 @@ def multiple_post_to_yandex_zen(posts, title):
     print(title)
     print(subtitle)
 
-    if driver is None:
-        driver = webdriver.Chrome(options=chrome_options)
-        authentificate_in_yandex_zen(driver)
+    driver = webdriver.Chrome(options=chrome_options)
+    authentificate_in_yandex_zen(driver)
 
     # Preparing
     # driver.get("https://zen.yandex.ru/profile/editor/id/5c8ce13954593600b40ba8e4")
