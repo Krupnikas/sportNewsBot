@@ -361,7 +361,17 @@ def publish(driver, tags, description):
 
     sleep(1)
 
-    driver.find_element_by_css_selector(".publication-settings-actions__action").click()
+    try:
+
+        submit_button = driver.find_element_by_css_selector(".publication-settings-actions__action")
+        submit_button.click()
+
+        sleep(3)
+
+        submit_button = driver.find_element_by_css_selector(".publication-settings-actions__action")
+        ActionChains(driver).move_to_element(submit_button).pause(3).click().pause(1).perform()
+    except Exception as e:
+        print("Seems to be published...")
 
     sleep(5)
     #
