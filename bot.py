@@ -32,7 +32,7 @@ chrome_options = Options()
 PostOnStartUp = False
 NewsCheckPeriod = 5 * 60    # seconds
 
-ArticlePostTimeMoscowOffset = 19.00  # Hours 19:00 Moscow UTC+3
+ArticlePostTimeMoscowOffset = 21.00  # Hours 19:00 Moscow UTC+3
 ArticlePostTimeUtcOffsetSeconds = (ArticlePostTimeMoscowOffset - 3) * 60 * 60
 
 LastPostDay = 0
@@ -485,8 +485,8 @@ def main():
             LastPostDay = day
             try:
                 pikaDay = day - 17980 + 4101
-                raiting = 6
-                pikaUrl = f"https://pikabu.ru/tag/Гифка?r={raiting}&d={pikaDay}&D={pikaDay}"
+                raiting = 5
+                pikaUrl = f"https://pikabu.ru/tag/Гифка?st=2&r={raiting}&d={pikaDay}&D={pikaDay}"
                 posts = get_multiple_posts(pikaUrl)
                 # title = random.choice(titles)
                 multiple_post_to_yandex_zen(posts, f"Подборка интересных гифок на вечер №{pikaDay - 4120}" )
