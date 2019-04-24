@@ -465,6 +465,20 @@ def multiple_post_to_yandex_zen(posts, title):
     driver.close()
 
 
+def create_title(N):
+    prefixes = ["Подборка", "Компилляция", "Сборник", "Выборка", "Набор", "Коллекция", "Агрегация"]
+    ajs = ["интересных", "отличных", "лучших", "залипательных", "смешных", "смешнейших", "неожиданных", "увлекательных", "занимательных", "захватывающих", "любопытных", "любопытнейших", "занятных", "занятнейших", "необычных", "забористых", "курьёзных", "курьёзнейших", "забавных","забавнейших", "смешных", "смешнейших", "примечательных" ]
+    middles = ["гифок", "роликов", "GIFок", "gif-анимаций", "кадров", "видео"]
+    postfixes = ["на вечер", "на сегодня", "чтобы скоротать время", "для всех"]
+
+    title = random.choice(prefixes) + " " + \
+            random.choice(ajs) + " " + \
+            random.choice(middles) + " " + \
+            random.choice(postfixes) + f" №{N}"
+
+    return title
+
+
 def main():
 
     global LastPostDay
@@ -489,7 +503,7 @@ def main():
                 pikaUrl = f"https://pikabu.ru/tag/Гифка?st=2&r={raiting}&d={pikaDay}&D={pikaDay}"
                 posts = get_multiple_posts(pikaUrl)
                 # title = random.choice(titles)
-                multiple_post_to_yandex_zen(posts, f"Подборка интересных гифок на вечер №{pikaDay - 4120}" )
+                multiple_post_to_yandex_zen(posts, create_title(pikaDay - 4120))
 
             except Exception as ex:
                 print('main: exception: ' + str(ex))
