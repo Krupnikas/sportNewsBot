@@ -42,7 +42,7 @@ TOKEN = '582293326:AAG-1JSt4WHDXE9kMu4KFs7pghcIWKFdFE0'
 postedLinksFilename = "posted.csv"
 postedLinks = []
 
-tag_black_list = ['reddit', '[моё]', 'длиннопост']
+tag_black_list = ['reddit', '[моё]', 'длиннопост', 'видео']
 
 titles = ["Подборка интересных гифок на вечер",
           "Самые интересные гифки за сегодня",
@@ -362,7 +362,7 @@ def add_flipped_video_paragraph(driver, url):
 
     upload_element = driver.find_element_by_xpath("//input[@type='file']")
     upload_element.send_keys(temp_file_path)
-    sleep(1.3)
+    sleep(30)
 
     images_num = len(driver.find_elements_by_css_selector(".zen-editor-block-image__image"))
     if images_num > before_images_num:
@@ -538,10 +538,11 @@ def rewrite_caption(caption):
         "г": "r",
         "е": "e",
         "ё": "e",
-        "к": "k",
         "о": "o",
+        "п": "n",
         "р": "p",
         "с": "c",
+        "т": "m",
         "у": "y",
         "х": "x",
         "А": "A",
@@ -556,17 +557,19 @@ def rewrite_caption(caption):
         "Р": "P",
         "С": "C",
         "Т": "T",
-        "У": "y",
         "Х": "X"
     }
 
     new_caption = ""
+    changed = 0
     for letter in caption:
         if letter in d.keys():
+            changed += 1
             new_caption += d[letter]
         else:
             new_caption += letter
 
+    print(f"Caption rewrited. Changed letters: {changed}. New caption: {new_caption}")
     return new_caption
 
 
