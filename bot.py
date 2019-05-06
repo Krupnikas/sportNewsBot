@@ -12,6 +12,7 @@ from postClass import *
 import bs4
 import sys
 import random
+import requests
 
 # from tendo import singleton
 # me = singleton.SingleInstance()
@@ -29,10 +30,9 @@ else:
 chrome_options = Options()
 # chrome_options.add_argument("--headless")
 
-PostOnStartUp = False
 NewsCheckPeriod = 5 * 60    # seconds
 
-ArticlePostTimeMoscowOffset = 21.00  # Hours 19:00 Moscow UTC+3
+ArticlePostTimeMoscowOffset = 15.00  # Hours 19:00 Moscow UTC+3
 ArticlePostTimeUtcOffsetSeconds = (ArticlePostTimeMoscowOffset - 3) * 60 * 60
 
 LastPostDay = 0
@@ -165,9 +165,9 @@ def get_multiple_posts(url):
             logging.warning(f"Post dropped. Wrong player ammount {amount}")
             continue
         gif_url = player['data-source']
-        if ".gif" not in gif_url:
-            logging.warning(f"Post dropped. Not a gif url: {gif_url}")
-            continue
+        # if ".gif" not in gif_url:
+        #     logging.warning(f"Post dropped. Not a gif url: {gif_url}")
+        #     continue
         if gif_url in postedLinks:
             print(f"Posted already: {post_url}")
             continue
@@ -324,6 +324,57 @@ def add_gif_paragraph(driver, url):
     return False
 
 
+def add_flipped_video_paragraph(driver, url):
+
+    sleep(1)
+    before_images_num = len(driver.find_elements_by_css_selector(".zen-editor-block-image__image"))
+
+    attachment_button = None
+    try:
+        create_new_paragraph(driver, True)
+        sleep(3)
+        attachment_button = driver.find_element_by_css_selector(".side-button.side-button_logo_image")
+        if attachment_button is None:
+            create_new_paragraph(driver, True)
+            sleep(1)
+            attachment_button = driver.find_element_by_css_selector(".side-button.side-button_logo_image")
+        attachment_button.click()
+        sleep(1)
+    except Exception as e:
+        print(f"Can't find or create attachment button {str(e)}")
+        return False
+
+    if attachment_button is None:
+        print("Can't find or create attachment button")
+        return False
+
+    #Preparing file
+    temp_file_path = f"{os.getcwd()}/temp.gif"
+    os.remove(temp_file_path)
+    command = f"ffmpeg -i {url} -vf hflip -c:a out {temp_file_path} -y"
+    os.system(command)
+    if not os.path.isfile(temp_file_path):
+        print("Downloading failed")
+        return False
+
+    # upload_button = driver.find_element_by_css_selector(".image-popup__file-button")
+    upload_element = driver.find_element_by_xpath("//input[@type='file']")
+    upload_element.send_keys(temp_file_path)
+    sleep(1.3)
+    # upload_button = driver.find_element_by_css_selector(".image-popup__file-button")
+    # upload_button.click()
+
+
+    images_num = len(driver.find_elements_by_css_selector(".zen-editor-block-image__image"))
+    if images_num > before_images_num:
+        print(f"Posted! {url}")
+        return True
+
+    print(f"Not posted :( {url}")
+
+    return False
+
+
 def add_gif_caption(driver, index, caption):
     captions = driver.find_elements_by_css_selector(".zen-editor-block-image__caption")
     # print(f"Captions num: {len(captions)}")
@@ -442,7 +493,7 @@ def multiple_post_to_yandex_zen(posts, title):
     failed_posts = []
 
     for post in posts:
-        if not add_gif_paragraph(driver, post.gif_url):
+        if not add_flipped_video_paragraph(driver, post.gif_url):
             print(f"Posting failed. Post {post.title} removed")
             failed_posts.append(post)
             continue
@@ -468,7 +519,7 @@ def multiple_post_to_yandex_zen(posts, title):
 def create_title(N):
     prefixes = ["Подборка", "Компилляция", "Сборник", "Выборка", "Набор", "Коллекция", "Агрегация"]
     ajs = ["интересных", "отличных", "лучших", "залипательных", "смешных", "смешнейших", "неожиданных", "увлекательных", "занимательных", "захватывающих", "любопытных", "любопытнейших", "занятных", "занятнейших", "необычных", "забористых", "курьёзных", "курьёзнейших", "забавных","забавнейших", "смешных", "смешнейших", "примечательных" ]
-    middles = ["гифок", "роликов", "GIFок", "gif-анимаций", "кадров", "видео"]
+    middles = ["гифок", "гиффок", "роликов", "GIFок", "gif-анимаций", "кадров", "видео"]
     postfixes = ["на вечер", "на сегодня", "чтобы скоротать время", "для всех"]
 
     title = random.choice(prefixes) + " " + \
@@ -486,7 +537,7 @@ def main():
     if len(sys.argv) == 1:
         print("Skipping first day. To post run with any argument")
         t = round(datetime.now().timestamp())
-        LastPostDay = t // (24 * 60 * 60)
+        # LastPostDay = t // (24 * 60 * 60)
 
     while True:
 
