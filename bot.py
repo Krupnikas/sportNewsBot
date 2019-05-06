@@ -165,9 +165,10 @@ def get_multiple_posts(url):
             logging.warning(f"Post dropped. Wrong player ammount {amount}")
             continue
         gif_url = player['data-source']
-        # if ".gif" not in gif_url:
-        #     logging.warning(f"Post dropped. Not a gif url: {gif_url}")
-        #     continue
+        if ".gif" not in gif_url:
+            gif_url = gif_url + ".webm"
+            logging.warning(f"Not a gif url: {gif_url}")
+            # continue
         if gif_url in postedLinks:
             print(f"Posted already: {post_url}")
             continue
@@ -327,6 +328,17 @@ def add_gif_paragraph(driver, url):
 def add_flipped_video_paragraph(driver, url):
 
     sleep(1)
+    #Preparing file
+    temp_file_path = f"{os.getcwd()}/temp.gif"
+    if os.path.isfile(temp_file_path):
+        os.remove(temp_file_path)
+    command = f"ffmpeg -i {url} -vf hflip -c:a out {temp_file_path} -y"
+    os.system(command)
+    if not os.path.isfile(temp_file_path):
+        print("Downloading failed")
+        return False
+
+    sleep(1)
     before_images_num = len(driver.find_elements_by_css_selector(".zen-editor-block-image__image"))
 
     attachment_button = None
@@ -348,22 +360,9 @@ def add_flipped_video_paragraph(driver, url):
         print("Can't find or create attachment button")
         return False
 
-    #Preparing file
-    temp_file_path = f"{os.getcwd()}/temp.gif"
-    os.remove(temp_file_path)
-    command = f"ffmpeg -i {url} -vf hflip -c:a out {temp_file_path} -y"
-    os.system(command)
-    if not os.path.isfile(temp_file_path):
-        print("Downloading failed")
-        return False
-
-    # upload_button = driver.find_element_by_css_selector(".image-popup__file-button")
     upload_element = driver.find_element_by_xpath("//input[@type='file']")
     upload_element.send_keys(temp_file_path)
     sleep(1.3)
-    # upload_button = driver.find_element_by_css_selector(".image-popup__file-button")
-    # upload_button.click()
-
 
     images_num = len(driver.find_elements_by_css_selector(".zen-editor-block-image__image"))
     if images_num > before_images_num:
@@ -378,6 +377,8 @@ def add_flipped_video_paragraph(driver, url):
 def add_gif_caption(driver, index, caption):
     captions = driver.find_elements_by_css_selector(".zen-editor-block-image__caption")
     # print(f"Captions num: {len(captions)}")
+
+    caption = rewrite_caption(caption)
 
     pyperclip.copy(caption)
 
@@ -528,6 +529,45 @@ def create_title(N):
             random.choice(postfixes) + f" №{N}"
 
     return title
+
+
+def rewrite_caption(caption):
+
+    d = {
+        "а": "a",
+        "г": "r",
+        "е": "e",
+        "ё": "e",
+        "к": "k",
+        "о": "o",
+        "р": "p",
+        "с": "c",
+        "у": "y",
+        "х": "x",
+        "А": "A",
+        "В": "B",
+        "Е": "E",
+        "Ё": "E",
+        "З": "3",
+        "К": "K",
+        "М": "M",
+        "Н": "H",
+        "О": "O",
+        "Р": "P",
+        "С": "C",
+        "Т": "T",
+        "У": "y",
+        "Х": "X"
+    }
+
+    new_caption = ""
+    for letter in caption:
+        if letter in d.keys():
+            new_caption += d[letter]
+        else:
+            new_caption += letter
+
+    return new_caption
 
 
 def main():
