@@ -32,7 +32,7 @@ chrome_options = Options()
 
 NewsCheckPeriod = 5 * 60    # seconds
 
-ArticlePostTimeMoscowOffset = 15.00  # Hours 19:00 Moscow UTC+3
+ArticlePostTimeMoscowOffset = 19.00  # Hours 19:00 Moscow UTC+3
 ArticlePostTimeUtcOffsetSeconds = (ArticlePostTimeMoscowOffset - 3) * 60 * 60
 
 LastPostDay = 0
@@ -595,7 +595,7 @@ def main():
             print("It's time to post!")
             LastPostDay = day
             try:
-                yesterday = 3
+                yesterday = 0
                 if not prod:
                     yesterday = 4
                 pikaDay = day - 17980 + 4101 - yesterday
