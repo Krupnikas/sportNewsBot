@@ -19,13 +19,13 @@ import requests
 prod = True
 
 if prod:
+    login = "bot@nightone.tech"
+    password = "botnightone"
+    editor_link = "https://zen.yandex.ru/profile/editor/id/5cdd5ff0ec80c500b3d3a93f"
+else:
     login = "sk@nightone.tech"
     password = "Klazklaz37"
     editor_link = "https://zen.yandex.ru/profile/editor/id/5c99341cc56eea00b2639f88"
-else:
-    login = "krupnik35"
-    password = "Klazklaz37"
-    editor_link = "https://zen.yandex.ru/profile/editor/id/5c8ce13954593600b40ba8e4"
 
 chrome_options = Options()
 # chrome_options.add_argument("--headless")
@@ -362,7 +362,7 @@ def add_flipped_video_paragraph(driver, url):
 
     upload_element = driver.find_element_by_xpath("//input[@type='file']")
     upload_element.send_keys(temp_file_path)
-    sleep(30)
+    sleep(60)
 
     images_num = len(driver.find_elements_by_css_selector(".zen-editor-block-image__image"))
     if images_num > before_images_num:
@@ -514,6 +514,8 @@ def multiple_post_to_yandex_zen(posts, title):
 
     publish(driver, tags, subtitle)
 
+    print("Browser is going to be closed!")
+    sleep(120)
     driver.close()
 
 
@@ -580,7 +582,8 @@ def main():
     if len(sys.argv) == 1:
         print("Skipping first day. To post run with any argument")
         t = round(datetime.now().timestamp())
-        # LastPostDay = t // (24 * 60 * 60)
+        # if prod:
+            # LastPostDay = t // (24 * 60 * 60)
 
     while True:
 
@@ -592,12 +595,15 @@ def main():
             print("It's time to post!")
             LastPostDay = day
             try:
-                pikaDay = day - 17980 + 4101
+                yesterday = 3
+                if not prod:
+                    yesterday = 4
+                pikaDay = day - 17980 + 4101 - yesterday
                 raiting = 5
                 pikaUrl = f"https://pikabu.ru/tag/Гифка?st=2&r={raiting}&d={pikaDay}&D={pikaDay}"
                 posts = get_multiple_posts(pikaUrl)
                 # title = random.choice(titles)
-                multiple_post_to_yandex_zen(posts, create_title(pikaDay - 4120))
+                multiple_post_to_yandex_zen(posts, create_title(pikaDay - 4149))
 
             except Exception as ex:
                 print('main: exception: ' + str(ex))
