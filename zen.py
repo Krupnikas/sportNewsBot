@@ -167,7 +167,8 @@ class ZenPublisher():
         self.add_image_paragraph(article.top_image)
         for paragraph in article.text.split('\n')[:-1]:
             text  = self.translator.translate(paragraph,  dest='ru').text
-            self.add_text_paragraph(text)
+            if 'WIRED' not in text:
+                self.add_text_paragraph(text)
 
 
     def publish(self, tags, description):
@@ -182,13 +183,15 @@ class ZenPublisher():
             ActionChains(self.driver).move_to_element(description_input).click().send_keys(
                 Keys.BACK_SPACE).send_keys(Keys.DELETE).perform()
 
-        sleep(1)
-        ActionChains(self.driver).move_to_element(description_input).click().pause(0.5).send_keys(description).pause(0.5).perform()
+        sleep(2)
+        print("Filling description: " + description)
+        ActionChains(self.driver).move_to_element(description_input).click().pause(0.5).click().pause(0.5).send_keys(description).pause(0.5).perform()
 
-        sleep(1)
+        sleep(2)
 
         tags_input = self.driver.find_element_by_css_selector(".ui-lib-tag-input__input")
-        ActionChains(self.driver).move_to_element(tags_input).click().pause(0.5).send_keys(",".join(tags)).pause(0.5).perform()
+        print("Filling tags: " + ",".join(tags))
+        ActionChains(self.driver).move_to_element(tags_input).click().pause(0.5).click().pause(0.5).send_keys(",".join(tags)).pause(0.5).perform()
 
         sleep(1)
 
