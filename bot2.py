@@ -13,9 +13,9 @@ from zen import ZenPublisher
 import googletrans
 import pymorphy2
 
-login = "bot2@nightone.tech"
+login = "bot3@nightone.tech"
 password = "botnightone"
-editor_link = "https://zen.yandex.ru/profile/editor/id/5d30676b4e057700ad48cedb"
+editor_link = "https://zen.yandex.ru/profile/editor/id/5d49b5f7ecfb8000acf23057"
 
 category = "business"
 rootUrl = 'https://www.wired.com'
@@ -65,13 +65,16 @@ def postArticleToYandexZen(article):
 
 def makePost():
     links = get_links(mainUrl)
-    article = newspaper.Article(links[0])
+    article = newspaper.Article(links[1])
     article.download()
     article.parse()
     postArticleToYandexZen(article)
 
 
-schedule.every().day.at("19:00").do(makePost)
+makePost()
+exit(0)
+
+schedule.every().day.at("20:13").do(makePost)
 while True:
     schedule.run_pending()
     time.sleep(5)

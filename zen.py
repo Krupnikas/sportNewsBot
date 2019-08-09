@@ -56,17 +56,16 @@ class ZenPublisher():
         if last_field.text != "" or force:
             print("Creating new paragraph")
             actions = ActionChains(self.driver)
-            actions.reset_actions()
-            actions.move_to_element(last_field)
-            actions.click()
-            actions.release()
-            actions.pause(0.5)
-            actions.send_keys(Keys.END)
-            actions.send_keys(Keys.CONTROL, Keys.END)
-            actions.pause(0.5)
+            # actions.reset_actions()
+            # actions.move_to_element(last_field)
+            # actions.click()
+            # actions.release()
+            # actions.pause(1.5)
+            # actions.send_keys(Keys.COMMAND, Keys.ARROW_DOWN)
+            # actions.pause(1.5)
             actions.send_keys(Keys.SPACE)
             actions.send_keys(Keys.RETURN)
-            actions.pause(1.5)
+            actions.pause(2.5)
             actions.perform()
             fields = self.driver.find_elements_by_css_selector(".public-DraftStyleDefault-block.public-DraftStyleDefault-ltr")
             last_field = fields[-1]
@@ -93,7 +92,7 @@ class ZenPublisher():
         actions.move_to_element(last_field)
         actions.click()
         actions.release()
-        actions.pause(0.5)
+        actions.pause(1.5)
         actions.send_keys(text)
         actions.perform()
 
@@ -148,9 +147,9 @@ class ZenPublisher():
         self.driver.get(editor_link)
         sleep(1.1)
 
-        self.driver.find_element_by_css_selector(".header__add-button").click()
+        self.driver.find_element_by_css_selector(".new-publication-dropdown__add-button").click()
         sleep(1.2)
-        self.driver.find_element_by_css_selector(".header__popup-add-button_article").click()
+        self.driver.find_element_by_css_selector(".new-publication-dropdown__button-desc").click()
         sleep(1.4)
         try:
             close_btn = self.driver.find_element_by_css_selector(
@@ -165,10 +164,13 @@ class ZenPublisher():
         title = self.translator.translate(article.title, dest='ru').text
         self.add_title(title)
         self.add_image_paragraph(article.top_image)
-        for paragraph in article.text.split('\n')[:-1]:
-            text  = self.translator.translate(paragraph,  dest='ru').text
-            if 'WIRED' not in text:
-                self.add_text_paragraph(text)
+        text  = self.translator.translate(article.summary,  dest='ru').text
+        self.add_text_paragraph(text)
+        sleep(10)
+        # for paragraph in article.text.split('\n')[:-1]:
+        #     text  = self.translator.translate(paragraph,  dest='ru').text
+        #     if 'WIRED' not in text:
+        #         self.add_text_paragraph(text)
 
 
     def publish(self, tags, description):
