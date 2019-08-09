@@ -64,17 +64,23 @@ def postArticleToYandexZen(article):
 
 
 def makePost():
-    links = get_links(mainUrl)
-    article = newspaper.Article(links[1])
-    article.download()
-    article.parse()
-    postArticleToYandexZen(article)
+
+    try:
+        links = get_links(mainUrl)
+        article = newspaper.Article(links[0])
+        article.download()
+        article.parse()
+        postArticleToYandexZen(article)
+    except Exception as e:
+        pass
 
 
 makePost()
 exit(0)
 
-schedule.every().day.at("20:13").do(makePost)
+schedule.every().day.at("11:00").do(makePost)
+schedule.every().day.at("15:00").do(makePost)
+schedule.every().day.at("19:00").do(makePost)
 while True:
     schedule.run_pending()
     time.sleep(5)
