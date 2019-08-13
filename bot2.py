@@ -65,19 +65,29 @@ def postArticleToYandexZen(article):
 
 def makePost():
 
-    try:
-        links = get_links(mainUrl)
-        article = newspaper.Article(links[0])
-        article.download()
-        article.parse()
-        postArticleToYandexZen(article)
-    except Exception as e:
-        pass
+	global posted_links
+
+	try:
+		links = get_links(mainUrl)
+		url = None
+		for link in links:
+			if link not in posted_links: 
+				url = link
+				break
+		if url is None:
+			print("No new articles :(")
+			return
+		article = newspaper.Article(url)
+		article.download()
+		article.parse()
+		postArticleToYandexZen(article)
+	except Exception as e:
+		pass
 
 
+posted_links = get_links(mainUrl)
 makePost()
-exit(0)
-
+# exit(0)
 schedule.every().day.at("11:00").do(makePost)
 schedule.every().day.at("15:00").do(makePost)
 schedule.every().day.at("19:00").do(makePost)
