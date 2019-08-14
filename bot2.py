@@ -77,6 +77,7 @@ def makePost():
 		if url is None:
 			print("No new articles :(")
 			return
+		posted_links.append(url)
 		article = newspaper.Article(url)
 		article.download()
 		article.parse()
